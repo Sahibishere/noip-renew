@@ -239,35 +239,18 @@ class Robot:
 
 
 def main(argv=None):
-    # check if we're running on docker
-    DOCKER = os.environ.get("CONTAINER", "").lower() in ("yes", "y", "on", "true", "1")
-    if DOCKER:
-        print("Running inside docker container")
-        noip_username = os.environ.get('NOIP_USERNAME','')
-        noip_password = os.environ.get('NOIP_PASSWORD','')
-        noip_totp = os.environ.get('NOIP_2FA_SECRET_KEY','')
-        debug = int(os.environ.get('NOIP_DEBUG', 1))
-        if len(noip_username) == 0 or len(noip_password) == 0 or len(noip_totp) == 0: sys.exit('You are using docker, you need to specify the required parameters as environment varialbes, check the documentation.')
-    else:
-        noip_username, noip_password, noip_totp, debug = get_args_values(argv)
-    return (Robot(noip_username, noip_password, noip_totp, debug, DOCKER)).run()
+    # GitHub Actions or Docker container use environment variables
+    noip_username = os.environ.get('USERNAME', '')
+    noip_password = os.environ.get('PASSWORD', '')
+    noip_totp = os.environ.get('TOTP_SECRET', '')
+    debug = int(os.environ.get('NOIP_DEBUG', 1))  # Optional debug level
 
-
-def get_args_values(argv):
-    if argv is None:
-        argv = sys.argv
-    if len(argv) < 4:
-        print(f"Usage: {argv[0]} <noip_username> <noip_base64encoded_password> <2FA_secret_key> [<debug-level>] ")
+    if not all([noip_username, noip_password, noip_totp]):
+        print("Missing USERNAME, PASSWORD, or TOTP_SECRET in environment variables.")
         sys.exit(1)
 
-    noip_username = argv[1]
-    noip_password = argv[2]
-    noip_totp = argv[3]
-    debug = 1
-    if len(argv) > 4:
-        debug = int(argv[4])
-    return noip_username, noip_password, noip_totp, debug
+    return Robot(noip_username, noip_password, noip_totp, debug, docker=False).run()
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    sys.exit()
