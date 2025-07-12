@@ -243,7 +243,7 @@ def main(argv=None):
     noip_username = os.environ.get('USERNAME', '')
     noip_password = os.environ.get('PASSWORD', '')
     noip_totp = os.environ.get('TOTP_SECRET', '')
-    debug = int(os.environ.get('NOIP_DEBUG', 1))  # Optional debug level
+    debug = 2
 
     if not all([noip_username, noip_password, noip_totp]):
         print("Missing USERNAME, PASSWORD, or TOTP_SECRET in environment variables.")
