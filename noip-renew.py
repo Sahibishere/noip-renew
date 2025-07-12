@@ -186,6 +186,7 @@ class Robot:
             raise Exception("Manual intervention required. Upgrade text detected.")
 
         self.browser.save_screenshot(f"{host_name}_success.png")
+        print(f"✅ Hostnames processed: {iteration - 1}, Renewed: {count}")
 
     @staticmethod
     def get_host_expiration_days(host, iteration):
@@ -208,7 +209,7 @@ class Robot:
 
     @staticmethod
     def get_host_button(host, iteration):
-        return host.find_element(By.XPATH, "//td[6]/button[contains(@class, 'btn-success')]")
+        return host.find_element(By.XPATH, ".//button[contains(@class, 'btn-success')]")
 
     def get_hosts(self):
         host_tds = self.browser.find_elements(By.XPATH, "//td[@data-title=\"Host\"]")
