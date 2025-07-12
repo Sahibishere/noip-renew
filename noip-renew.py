@@ -218,31 +218,31 @@ class Robot:
         return host_tds
 
     def run(self):
-    rc = 0
-    self.logger.log(f"No-IP renew script version {VERSION}")
-    self.logger.log(f"Debug level: {self.debug}")
-    try:
-        print("🔐 Starting login process...")
-        self.login()
-        print("✅ Login successful. Proceeding to update hosts...")
-        if not self.update_hosts():
-            print("⚠️ update_hosts() returned False — no hosts updated.")
-            rc = 3
-        else:
-            print("✅ Host update process completed successfully.")
-    except Exception as e:
-        print("❌ Exception caught in run():", str(e))
-        self.logger.log(str(e))
-        self.browser.save_screenshot("exception.png")
-        if not self.docker:
-            try:
-                subprocess.call(['/usr/local/bin/noip-renew-skd.sh', "*", "*", "False"])
-            except (FileNotFoundError, PermissionError):
-                self.logger.log("noip-renew-skd.sh missing or not executable, skipping crontab configuration")
-        rc = 2
-    finally:
-        self.browser.quit()
-    return rc
+        rc = 0
+        self.logger.log(f"No-IP renew script version {VERSION}")
+        self.logger.log(f"Debug level: {self.debug}")
+        try:
+            print("🔐 Starting login process...")
+            self.login()
+            print("✅ Login successful. Proceeding to update hosts...")
+            if not self.update_hosts():
+                print("⚠️ update_hosts() returned False — no hosts updated.")
+                rc = 3
+            else:
+                print("✅ Host update process completed successfully.")
+        except Exception as e:
+            print("❌ Exception caught in run():", str(e))
+            self.logger.log(str(e))
+            self.browser.save_screenshot("exception.png")
+            if not self.docker:
+                try:
+                    subprocess.call(['/usr/local/bin/noip-renew-skd.sh', "*", "*", "False"])
+                except (FileNotFoundError, PermissionError):
+                    self.logger.log("noip-renew-skd.sh missing or not executable, skipping crontab configuration")
+            rc = 2
+        finally:
+            self.browser.quit()
+        return rc
 
 
 def main(argv=None):
