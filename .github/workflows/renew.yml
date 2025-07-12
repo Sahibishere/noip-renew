@@ -1,0 +1,37 @@
+name: No-IP Renew
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 7 1 * *'  # Every 1st of the month at 07:00 UTC
+
+jobs:
+  renew:
+    runs-on: ubuntu-latest
+
+    env:
+      USERNAME: ${{ secrets.USERNAME }}
+      PASSWORD: ${{ secrets.PASSWORD }}
+      TOTP_SECRET: ${{ secrets.TOTP_SECRET }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y chromium-browser chromium-chromedriver
+        python3 -m pip install --upgrade pip
+        pip3 install -r requirements.txt
+
+    - name: Link Chromium to expected path
+      run: |
+        sudo ln -fs /usr/bin/chromium-browser /usr/bin/google-chrome
+        sudo ln -fs /usr/lib/chromium-browser/chromedriver /usr/bin/chromedriver || true
+
+    - name: Run the renewal script
+      run: |
+        export CHROME_BIN=/usr/bin/google-chrome
+        export CHROMEDRIVER=/usr/bin/chromedriver
+        python3 renew.py
