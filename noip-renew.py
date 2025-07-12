@@ -65,7 +65,7 @@ class Robot:
         #added for Raspbian Buster 4.0+ versions. Check https://www.raspberrypi.org/forums/viewtopic.php?t=258019 for reference.
         options.add_argument("disable-features=VizDisplayCompositor")
         options.add_argument("headless")
-        options.add_argument("no-sandbox")  # need when run in docker
+        options.add_argument("no-sandbox")  # need when  in docker
         options.add_argument("window-size=1200x800")
         options.add_argument(f"user-agent={Robot.USER_AGENT}")
         options.add_argument("disable-gpu")
@@ -94,7 +94,7 @@ class Robot:
         
         ele_usr.send_keys(self.username)
 
-        # If running on docker, password is not base64 encoded
+        # If ning on docker, password is not base64 encoded
         if self.docker:
             ele_pwd.send_keys(self.password)
         else:
@@ -218,25 +218,31 @@ class Robot:
         return host_tds
 
     def run(self):
-        rc = 0
-        self.logger.log(f"No-IP renew script version {VERSION}")
-        self.logger.log(f"Debug level: {self.debug}")
-        try:
-            self.login()
-            if not self.update_hosts():
-                rc = 3
-        except Exception as e:
-            self.logger.log(str(e))
-            self.browser.save_screenshot("exception.png")
-            if not self.docker:
-                try:
-                    subprocess.call(['/usr/local/bin/noip-renew-skd.sh', "*", "*", "False"])
-                except (FileNotFoundError,PermissionError):
-                    self.logger.log(f"noip-renew-skd.sh missing or not executable, skipping crontab configuration")
-            rc = 2
-        finally:
-            self.browser.quit()
-        return rc
+    rc = 0
+    self.logger.log(f"No-IP renew script version {VERSION}")
+    self.logger.log(f"Debug level: {self.debug}")
+    try:
+        print("🔐 Starting login process...")
+        self.login()
+        print("✅ Login successful. Proceeding to update hosts...")
+        if not self.update_hosts():
+            print("⚠️ update_hosts() returned False — no hosts updated.")
+            rc = 3
+        else:
+            print("✅ Host update process completed successfully.")
+    except Exception as e:
+        print("❌ Exception caught in run():", str(e))
+        self.logger.log(str(e))
+        self.browser.save_screenshot("exception.png")
+        if not self.docker:
+            try:
+                subprocess.call(['/usr/local/bin/noip-renew-skd.sh', "*", "*", "False"])
+            except (FileNotFoundError, PermissionError):
+                self.logger.log("noip-renew-skd.sh missing or not executable, skipping crontab configuration")
+        rc = 2
+    finally:
+        self.browser.quit()
+    return rc
 
 
 def main(argv=None):
