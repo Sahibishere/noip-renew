@@ -33,3 +33,11 @@ jobs:
         export CHROME_BIN=/usr/bin/google-chrome
         export CHROMEDRIVER=/usr/bin/chromedriver
         python3 noip-renew.py
+
+    - name: Upload screenshots (if any)
+      uses: actions/upload-artifact@v4
+      with:
+        name: noip-renew-screenshots
+        path: |
+          *.png
+
